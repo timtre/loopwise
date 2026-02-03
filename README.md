@@ -23,8 +23,8 @@ Loopwise is an open-source tool that analyzes traces from LLM observability plat
 git clone https://github.com/yourusername/loopwise.git
 cd loopwise
 
-# Install with pip
-pip install -e ".[dev]"
+# Install with Poetry
+poetry install
 ```
 
 ## Quick Start
@@ -158,14 +158,14 @@ loopwise/
 ## Development
 
 ```bash
-# Install dev dependencies
-pip install -e ".[dev]"
+# Install dependencies (including dev)
+poetry install
 
 # Run tests
-pytest tests/ -v
+poetry run pytest tests/ -v
 
 # Run linter
-ruff check loopwise/
+poetry run ruff check loopwise/
 ```
 
 ## License
