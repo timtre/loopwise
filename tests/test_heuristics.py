@@ -2,8 +2,6 @@
 
 from datetime import datetime
 
-import pytest
-
 from loopwise.analysis.heuristics import (
     HEURISTICS,
     compute_score_from_results,
@@ -99,9 +97,7 @@ class TestH3ToolLoops:
 
     def test_no_tool_calls(self):
         """Test trace with no tool calls."""
-        events = [
-            TraceEvent(id="e1", trace_id="test", type="llm_call", extra_data={})
-        ]
+        events = [TraceEvent(id="e1", trace_id="test", type="llm_call", extra_data={})]
         trace = create_trace(events=events)
         result = h3_tool_loops(trace)
         assert result.score == 0.0
@@ -109,9 +105,7 @@ class TestH3ToolLoops:
     def test_normal_tool_usage(self):
         """Test trace with normal tool usage (no loops)."""
         events = [
-            TraceEvent(
-                id="e1", trace_id="test", type="tool_call", extra_data={"name": "search"}
-            ),
+            TraceEvent(id="e1", trace_id="test", type="tool_call", extra_data={"name": "search"}),
             TraceEvent(
                 id="e2", trace_id="test", type="tool_call", extra_data={"name": "calculator"}
             ),
@@ -123,9 +117,7 @@ class TestH3ToolLoops:
     def test_tool_loop_detected(self):
         """Test trace with tool loop (same tool called 3+ times)."""
         events = [
-            TraceEvent(
-                id=f"e{i}", trace_id="test", type="tool_call", extra_data={"name": "search"}
-            )
+            TraceEvent(id=f"e{i}", trace_id="test", type="tool_call", extra_data={"name": "search"})
             for i in range(5)
         ]
         trace = create_trace(events=events)

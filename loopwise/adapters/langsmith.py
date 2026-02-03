@@ -92,17 +92,19 @@ class LangSmithAdapter(TraceAdapter):
                 parent_run_id=parent_run_id,
             )
             for child in child_runs:
-                children.append({
-                    "id": str(child.id),
-                    "name": child.name,
-                    "run_type": child.run_type,
-                    "start_time": child.start_time,
-                    "end_time": child.end_time,
-                    "inputs": child.inputs or {},
-                    "outputs": child.outputs or {},
-                    "error": child.error,
-                    "extra": child.extra or {},
-                })
+                children.append(
+                    {
+                        "id": str(child.id),
+                        "name": child.name,
+                        "run_type": child.run_type,
+                        "start_time": child.start_time,
+                        "end_time": child.end_time,
+                        "inputs": child.inputs or {},
+                        "outputs": child.outputs or {},
+                        "error": child.error,
+                        "extra": child.extra or {},
+                    }
+                )
         except Exception:
             # If we can't fetch children, continue with empty list
             pass
@@ -170,9 +172,7 @@ class LangSmithAdapter(TraceAdapter):
 
         return trace, events
 
-    def _create_event_from_run(
-        self, run: dict[str, Any], parent_id: str | None
-    ) -> TraceEvent:
+    def _create_event_from_run(self, run: dict[str, Any], parent_id: str | None) -> TraceEvent:
         """Create a TraceEvent from a LangSmith run."""
         # Map run_type to our event types
         event_type = self._map_run_type(run.get("run_type", ""))

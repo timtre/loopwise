@@ -3,7 +3,7 @@ name = "loopwise"
 version = "0.1.0"
 description = "Ingest LLM traces, detect problematic sessions, and generate improvement suggestions"
 readme = "README.md"
-authors = ["Tim"]
+authors = ["Tim Treskatis"]
 license = "MIT"
 keywords = ["llm", "observability", "langsmith", "traces", "debugging"]
 classifiers = [
@@ -31,6 +31,8 @@ rich = "^13.7.0"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.23.0"
 ruff = "^0.1.0"
+pre-commit = "^3.6.0"
+black = "^24.10.0"
 
 [tool.poetry.scripts]
 loopwise = "loopwise.cli:app"
@@ -45,6 +47,10 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

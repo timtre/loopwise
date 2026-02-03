@@ -107,9 +107,9 @@ class Settings(BaseSettings):
 
         # Convert value to appropriate type
         field_info = self.model_fields[key]
-        if field_info.annotation == int:
+        if field_info.annotation is int:
             value = int(value)
-        elif field_info.annotation == float:
+        elif field_info.annotation is float:
             value = float(value)
 
         setattr(self, key, value)

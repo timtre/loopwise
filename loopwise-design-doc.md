@@ -149,7 +149,7 @@ def h2_errors(trace: NormalizedTrace) -> HeuristicResult:
 def h3_tool_loops(trace: NormalizedTrace) -> HeuristicResult:
     tool_calls = [e for e in trace.events if e.type == "tool_call"]
     tool_counts = Counter(e.metadata.get("tool_name") for e in tool_calls)
-    
+
     for tool, count in tool_counts.items():
         if count >= 3:
             return HeuristicResult(
@@ -178,12 +178,12 @@ def h4_high_latency(trace: NormalizedTrace, threshold_ms: int = 30000) -> Heuris
 def h5_user_frustration(trace: NormalizedTrace) -> HeuristicResult:
     user_messages = [e.input for e in trace.events if e.type == "user_input"]
     last_messages = user_messages[-3:]  # Check final messages
-    
+
     # Use LLM to detect frustration signals
     prompt = f"""Analyze these user messages for frustration signals.
     Messages: {last_messages}
     Return JSON: {{"frustrated": bool, "confidence": float, "signals": list[str]}}"""
-    
+
     result = llm_call(prompt)
     if result["frustrated"] and result["confidence"] > 0.7:
         return HeuristicResult(
@@ -200,13 +200,13 @@ def h6_poor_retrieval(trace: NormalizedTrace) -> HeuristicResult:
     retrievals = [e for e in trace.events if e.type == "retrieval"]
     if not retrievals:
         return HeuristicResult(score=0.0)
-    
+
     # Check if retrieved content was actually used in response
     # Use LLM to assess relevance
     for retrieval in retrievals:
         chunks = retrieval.output
         final_response = get_final_response(trace)
-        
+
         relevance = assess_relevance(chunks, final_response)
         if relevance < 0.3:
             return HeuristicResult(
@@ -228,11 +228,11 @@ def compute_unhappiness_score(trace: NormalizedTrace) -> float:
         "h5_user_frustration": 0.8,
         "h6_poor_retrieval": 0.7,
     }
-    
+
     results = run_all_heuristics(trace)
     weighted_sum = sum(results[h].score * w for h, w in weights.items())
     max_possible = sum(weights.values())
-    
+
     return weighted_sum / max_possible
 ```
 
@@ -253,7 +253,7 @@ class Suggestion:
     confidence: float  # 0-1
     issue_ids: list[str]  # linked issues
     evidence: dict  # supporting data
-    
+
     # Type-specific fields
     prompt_diff: Optional[PromptDiff]
     architecture_change: Optional[ArchitectureChange]
@@ -272,7 +272,7 @@ class ArchitectureChange:
     target: str
     recommendation: str
 
-@dataclass 
+@dataclass
 class KBChange:
     change_type: Literal["add_document", "update_document", "remove_document", "split_chunk"]
     target: Optional[str]
@@ -320,10 +320,10 @@ Add explicit refund policy to system prompt.
 
 DIFF:
   You are a helpful customer support agent...
-+ 
++
 + REFUND POLICY:
 + - Full refund within 30 days
-+ - Partial refund within 60 days  
++ - Partial refund within 60 days
 + - No refund after 60 days
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

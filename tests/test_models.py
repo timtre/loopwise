@@ -38,9 +38,7 @@ class TestHeuristicResult:
 
     def test_create_result(self):
         """Test creating heuristic result."""
-        result = HeuristicResult(
-            score=0.8, reason="Test reason", evidence={"key": "value"}
-        )
+        result = HeuristicResult(score=0.8, reason="Test reason", evidence={"key": "value"})
         assert result.score == 0.8
         assert result.reason == "Test reason"
         assert result.evidence == {"key": "value"}

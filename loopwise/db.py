@@ -8,7 +8,6 @@ from sqlmodel import Session, SQLModel, create_engine, select
 from loopwise.config import get_settings
 from loopwise.models import Issue, NormalizedTrace, Suggestion, TraceEvent
 
-
 # Global engine instance
 _engine = None
 
@@ -236,9 +235,7 @@ def get_suggestion(suggestion_id: str) -> Optional[Suggestion]:
 def get_suggestions(limit: int = 100) -> list[Suggestion]:
     """Get all suggestions."""
     with get_session() as session:
-        statement = (
-            select(Suggestion).order_by(Suggestion.created_at.desc()).limit(limit)
-        )
+        statement = select(Suggestion).order_by(Suggestion.created_at.desc()).limit(limit)
         return list(session.exec(statement).all())
 
 

@@ -10,7 +10,10 @@
       "Bash(python3:*)",
       "Bash(source:*)",
       "Bash(loopwise --help:*)",
-      "Bash(poetry update typer)"
+      "Bash(poetry update typer)",
+      "Bash(poetry show:*)",
+      "Bash(poetry run pre-commit run:*)",
+      "Bash(poetry run pytest:*)"
     ]
   }
 }

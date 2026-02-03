@@ -13,24 +13,21 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from loopwise import __version__
-from loopwise.config import get_settings, reload_settings
+from loopwise.config import get_settings
 from loopwise.db import (
     create_tables,
     get_issue,
     get_issues,
     get_stats,
-    get_suggestion,
     get_suggestions,
     get_trace_with_events,
     get_traces,
-    get_unhappy_traces,
     save_issue,
     save_suggestion,
     save_trace,
     update_issue_suggestion,
     update_trace_analysis,
 )
-from loopwise.models import NormalizedTrace
 
 app = typer.Typer(
     name="loopwise",
@@ -145,8 +142,6 @@ def ingest(
     project: Optional[str] = typer.Option(None, "--project", "-p", help="Project/workspace name"),
 ):
     """Ingest traces from an observability platform."""
-    settings = get_settings()
-
     # Parse duration
     try:
         duration = parse_duration(since)
@@ -159,6 +154,7 @@ def ingest(
     # Get adapter
     if source.lower() == "langsmith":
         from loopwise.adapters.langsmith import LangSmithAdapter
+
         try:
             adapter = LangSmithAdapter()
         except ValueError as e:
@@ -258,12 +254,14 @@ def analyze(
 
     # Print summary
     console.print()
-    console.print(Panel(
-        f"[green]Analyzed:[/green] {analyzed} traces\n"
-        f"[yellow]Unhappy:[/yellow] {unhappy} traces ({unhappy/analyzed*100:.1f}%)\n"
-        f"[cyan]Issues created:[/cyan] {issues_created}",
-        title="Analysis Complete",
-    ))
+    console.print(
+        Panel(
+            f"[green]Analyzed:[/green] {analyzed} traces\n"
+            f"[yellow]Unhappy:[/yellow] {unhappy} traces ({unhappy/analyzed*100:.1f}%)\n"
+            f"[cyan]Issues created:[/cyan] {issues_created}",
+            title="Analysis Complete",
+        )
+    )
 
 
 # ============================================================================
@@ -315,23 +313,27 @@ def issues_show(
     # Get associated trace
     trace = get_trace_with_events(issue.trace_id)
 
-    console.print(Panel(
-        f"[cyan]ID:[/cyan] {issue.id}\n"
-        f"[cyan]Heuristic:[/cyan] {issue.heuristic}\n"
-        f"[cyan]Score:[/cyan] {issue.score:.2f}\n"
-        f"[cyan]Reason:[/cyan] {issue.reason}\n"
-        f"[cyan]Evidence:[/cyan]\n{json.dumps(issue.evidence, indent=2, default=str)}\n"
-        f"[cyan]Trace ID:[/cyan] {issue.trace_id}\n"
-        f"[cyan]Group ID:[/cyan] {issue.group_id or 'ungrouped'}\n"
-        f"[cyan]Suggestion:[/cyan] {issue.suggestion_id or 'none'}",
-        title=f"Issue: {issue.id}",
-    ))
+    console.print(
+        Panel(
+            f"[cyan]ID:[/cyan] {issue.id}\n"
+            f"[cyan]Heuristic:[/cyan] {issue.heuristic}\n"
+            f"[cyan]Score:[/cyan] {issue.score:.2f}\n"
+            f"[cyan]Reason:[/cyan] {issue.reason}\n"
+            f"[cyan]Evidence:[/cyan]\n{json.dumps(issue.evidence, indent=2, default=str)}\n"
+            f"[cyan]Trace ID:[/cyan] {issue.trace_id}\n"
+            f"[cyan]Group ID:[/cyan] {issue.group_id or 'ungrouped'}\n"
+            f"[cyan]Suggestion:[/cyan] {issue.suggestion_id or 'none'}",
+            title=f"Issue: {issue.id}",
+        )
+    )
 
     if trace and trace.events:
         console.print("\n[bold]Associated Trace Events:[/bold]")
         for event in trace.events[:10]:
             error_indicator = "[red][ERROR][/red] " if event.extra_data.get("error") else ""
-            console.print(f"  {error_indicator}[{event.type}] {event.extra_data.get('name', 'unnamed')}")
+            console.print(
+                f"  {error_indicator}[{event.type}] {event.extra_data.get('name', 'unnamed')}"
+            )
             if event.extra_data.get("error"):
                 console.print(f"    Error: {event.extra_data['error'][:100]}")
 
@@ -343,11 +345,13 @@ def issues_show(
 
 @app.command()
 def suggest(
-    issue_id: Optional[str] = typer.Option(None, "--issue", "-i", help="Generate for specific issue"),
+    issue_id: Optional[str] = typer.Option(
+        None, "--issue", "-i", help="Generate for specific issue"
+    ),
     all_issues: bool = typer.Option(False, "--all", "-a", help="Generate for all ungrouped issues"),
 ):
     """Generate improvement suggestions using LLM analysis."""
-    from loopwise.analysis.clustering import get_group_summary, group_issues
+    from loopwise.analysis.clustering import group_issues
     from loopwise.suggestions.generator import SuggestionGenerator
 
     if not issue_id and not all_issues:
@@ -412,9 +416,7 @@ def suggest(
                 traces = [get_trace_with_events(tid) for tid in trace_ids[:5]]
                 traces = [t for t in traces if t]
 
-                suggestion = generator.generate_for_issue_group(
-                    group_id, group_issues_list, traces
-                )
+                suggestion = generator.generate_for_issue_group(group_id, group_issues_list, traces)
 
                 if suggestion:
                     save_suggestion(suggestion)
@@ -542,14 +544,16 @@ def stats():
     """Show database statistics."""
     db_stats = get_stats()
 
-    console.print(Panel(
-        f"[cyan]Total traces:[/cyan]    {db_stats['total_traces']}\n"
-        f"[cyan]Analyzed:[/cyan]        {db_stats['analyzed_traces']}\n"
-        f"[yellow]Unhappy:[/yellow]         {db_stats['unhappy_traces']}\n"
-        f"[magenta]Total issues:[/magenta]    {db_stats['total_issues']}\n"
-        f"[green]Suggestions:[/green]     {db_stats['total_suggestions']}",
-        title="Loopwise Statistics",
-    ))
+    console.print(
+        Panel(
+            f"[cyan]Total traces:[/cyan]    {db_stats['total_traces']}\n"
+            f"[cyan]Analyzed:[/cyan]        {db_stats['analyzed_traces']}\n"
+            f"[yellow]Unhappy:[/yellow]         {db_stats['unhappy_traces']}\n"
+            f"[magenta]Total issues:[/magenta]    {db_stats['total_issues']}\n"
+            f"[green]Suggestions:[/green]     {db_stats['total_suggestions']}",
+            title="Loopwise Statistics",
+        )
+    )
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ from collections import Counter
 from typing import Any
 
 from loopwise.config import get_settings
-from loopwise.models import HeuristicResult, NormalizedTrace, TraceEvent
+from loopwise.models import HeuristicResult, NormalizedTrace
 
 
 def h1_negative_feedback(trace: NormalizedTrace) -> HeuristicResult:
@@ -35,11 +35,13 @@ def h2_errors(trace: NormalizedTrace) -> HeuristicResult:
     for event in trace.events:
         error = event.extra_data.get("error")
         if error:
-            errors.append({
-                "event_id": event.id,
-                "event_type": event.type,
-                "error": str(error)[:200],  # Truncate long errors
-            })
+            errors.append(
+                {
+                    "event_id": event.id,
+                    "event_type": event.type,
+                    "error": str(error)[:200],  # Truncate long errors
+                }
+            )
 
     if errors:
         return HeuristicResult(

@@ -8,8 +8,7 @@ import anthropic
 from loopwise.config import get_settings
 from loopwise.models import Issue, NormalizedTrace, PromptDiff, Suggestion
 
-
-PROMPT_SUGGESTION_SYSTEM = """You are an expert at analyzing LLM agent traces and identifying improvements.
+PROMPT_SUGGESTION_SYSTEM = """You are an expert at analyzing LLM agent traces and improving them.
 Your task is to analyze issues detected in agent sessions and suggest prompt improvements.
 
 You will receive:
@@ -24,7 +23,7 @@ Respond with valid JSON in this exact format:
     "description": "Detailed description of the problem and why this change helps",
     "confidence": 0.85,
     "prompt_diff": {
-        "target_prompt": "identifier for which prompt to modify (e.g., 'system_prompt', 'tool_prompt')",
+        "target_prompt": "identifier for which prompt to modify (e.g., 'system_prompt')",
         "original": "The problematic part of the current prompt (if identifiable)",
         "suggested": "Your suggested replacement or addition",
         "change_summary": "Brief summary of the change"
@@ -134,10 +133,16 @@ class SuggestionGenerator:
         for trace in traces[:3]:  # Limit to 3 traces
             lines.append(f"### Trace {trace.id}")
             lines.append(f"- Session: {trace.session_id}")
-            lines.append(f"- Unhappiness Score: {trace.unhappiness_score:.2f}" if trace.unhappiness_score else "")
+            lines.append(
+                f"- Unhappiness Score: {trace.unhappiness_score:.2f}"
+                if trace.unhappiness_score
+                else ""
+            )
 
             if trace.feedback:
-                lines.append(f"- Feedback: score={trace.feedback.score}, comment={trace.feedback.comment}")
+                lines.append(
+                    f"- Feedback: score={trace.feedback.score}, comment={trace.feedback.comment}"
+                )
 
             lines.append("\nEvents:")
             for event in trace.events[:10]:  # Limit events

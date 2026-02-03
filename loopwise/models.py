@@ -1,12 +1,12 @@
 """Data models for Loopwise."""
 
+import uuid
 from datetime import datetime
 from typing import Any, Literal, Optional
-import uuid
 
 from pydantic import BaseModel, Field
-from sqlmodel import JSON, Column, Field as SQLField, Relationship, SQLModel
-
+from sqlmodel import JSON, Column, Relationship, SQLModel
+from sqlmodel import Field as SQLField
 
 # ============================================================================
 # Pydantic Models (for data transfer and validation)
@@ -78,7 +78,9 @@ class TraceEvent(SQLModel, table=True):
 
     id: str = SQLField(default_factory=generate_id, primary_key=True)
     trace_id: str = SQLField(foreign_key="traces.id", index=True)
-    type: str = SQLField(description="Event type: llm_call, tool_call, retrieval, user_input, agent_output")
+    type: str = SQLField(
+        description="Event type: llm_call, tool_call, retrieval, user_input, agent_output"
+    )
     timestamp: datetime = SQLField(default_factory=datetime.utcnow)
     input_text: str = SQLField(default="", description="Event input")
     output_text: str = SQLField(default="", description="Event output")
