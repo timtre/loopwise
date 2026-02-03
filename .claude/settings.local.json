@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(python:*)",
+      "Bash(python -m py_compile:*)",
+      "Bash(poetry install:*)",
+      "Bash(poetry env use:*)",
+      "Bash(poetry config:*)",
+      "Bash(python3:*)",
+      "Bash(source:*)",
+      "Bash(loopwise --help:*)",
+      "Bash(poetry update typer)"
+    ]
+  }
+}

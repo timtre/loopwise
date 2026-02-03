@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "loopwise"
+version = "0.1.0"
+description = "Ingest LLM traces, detect problematic sessions, and generate improvement suggestions"
+readme = "README.md"
+authors = ["Tim"]
+license = "MIT"
+keywords = ["llm", "observability", "langsmith", "traces", "debugging"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+uvicorn = "^0.27.0"
+sqlmodel = "^0.0.14"
+typer = "^0.15.0"
+httpx = "^0.26.0"
+anthropic = "^0.18.0"
+langsmith = "^0.0.87"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.1.0"
+rich = "^13.7.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.23.0"
+ruff = "^0.1.0"
+
+[tool.poetry.scripts]
+loopwise = "loopwise.cli:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
